@@ -5,19 +5,30 @@ from bokeh.plotting import figure
 from bokeh.models import Label
 
 import collections
+import colorsys
 import click
 import csv
 
+from matplotlib.colors import to_rgb, to_hex, hsv_to_rgb, rgb_to_hsv
 
-HGHT_LT = 0.6
-HGHT_PT = 0.4
+
+HGHT_LT = 0.8
+HGHT_PT = 0.6
 COLOR_BG = "#EAEAF2"
+
+def dim(hex, saturation=0.5):
+  rgb = to_rgb(hex)
+  hsv = rgb_to_hsv(rgb)
+  rgb = hsv_to_rgb((hsv[0], hsv[1], hsv[2]*saturation))
+
+  return to_hex(rgb)
+
 
 def generate(data, title="Figure", width=1000, height=350, x_range=None):
   
   output_file("output.html")
   
-  data["Total"] = (
+  data["Overall"] = (
     sum(item[0] for item in data.values()),
     sum(item[1] for item in data.values())
   )
@@ -43,14 +54,16 @@ def generate(data, title="Figure", width=1000, height=350, x_range=None):
   for k, v in data.items():
     lt, pt = v
     y = index+0.5
-    if k == "Total":
+    color = pal[index]
+
+    if k == "Overall":
       text = [f"{100/lt*pt:.2f}% Efficiency"]
-      p.rect(x=lt/2, y=y, width=lt, height=HGHT_LT, fill_alpha=0.4, color=pal[index])
-      p.rect(x=lt-pt/2, y=y, width=pt, height=HGHT_PT, color=pal[index])
+      p.rect(x=lt/2, y=y, width=lt, height=HGHT_LT, fill_alpha=0.4, color=color)
+      p.rect(x=lt-pt/2, y=y, width=pt, height=HGHT_PT, color=color)
       p.text(x=lt-pt/2, y=y, text=text, text_color="#ffffff", text_baseline="middle")
     else:
-      p.rect(x=offset+lt/2, y=y, width=lt, height=HGHT_LT, fill_alpha=0.4, color=pal[index])
-      p.rect(x=offset+lt - pt/2, y=y, width=pt, height=HGHT_PT, color=pal[index])
+      p.rect(x=offset+lt/2, y=y, width=lt, height=HGHT_LT, fill_alpha=0.4, color=color)
+      p.rect(x=offset+lt - pt/2, y=y, width=pt, height=HGHT_PT, line_color=dim(color, 0.8), color=color)
   
     index -= 1
     offset = offset + lt
