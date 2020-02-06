@@ -25,21 +25,21 @@ def label(p, x, y, align, color, text):
   LABEL_SIZE = "9pt"
   LABEL_OFFSET = 2
 
-  opposite = { "left": "right", "right": "left" }[align]
-  x_offset = LABEL_OFFSET if align=="right" else -LABEL_OFFSET
+  x_offset = LABEL_OFFSET if align=="left" else -LABEL_OFFSET
   
   l = Label(
-    x=x, y=y, x_offset=x_offset,
+    x=x, y=y,
+    x_offset=x_offset,
     text=f" {text} ",
     text_font_size=LABEL_SIZE, text_color=white,
-    text_baseline='middle', text_align=opposite,
+    text_baseline='middle', text_align=align,
     background_fill_color=color, border_line_color=darken(color),
     )
   
-  p.add_layout(l, place=align)
+  p.add_layout(l)
 
 
-def bar(p, y, offset, key, value, color, ca_threshold, ar_threshold):
+def bar(p, y, offset, key, value, color, units, ca_threshold, ar_threshold):
   HGHT_LT = 0.8
   HGHT_PT = 0.6
 
@@ -47,11 +47,11 @@ def bar(p, y, offset, key, value, color, ca_threshold, ar_threshold):
 
   color_ca = firebrick.to_hex() if ca <= ca_threshold else darkgray.to_hex()
   if ca>0:
-    label(p, offset+lt, y, "right", color_ca, f"{ca:.0f}%")
+    label(p, offset+lt, y, "left", color_ca, f"{ca:.0f}%")
     
   color_ar = goldenrod.to_hex() if ar >= ar_threshold else darkgray.to_hex()
   if ar>0:
-    label(p, offset, y, "left", color_ar, f"{ar:.0f}h")
+    label(p, offset, y, "right", color_ar, f"{ar:.0f}{units}")
 
   p.rect(x=offset+lt/2, y=y, width=lt, height=HGHT_LT,
     line_color=darken(color), color=lighten(color))
@@ -66,7 +66,7 @@ def generate(data, title, width, height, x_range, units):
   Generate the chart
   """
   
-  PADDING_PERCENT = 0.25  # left-right margin to accomodate labels
+  PADDING_PERCENT = 0.1  # left-right margin to accomodate labels
 
   output_file("output.html")
   
@@ -94,7 +94,7 @@ def generate(data, title, width, height, x_range, units):
   offset = 0
 
   for key, value in data.items():
-    offset = offset + bar(p, index+0.5, offset, key, value, pal[index], ca_threshold, ar_threshold)
+    offset = offset + bar(p, index+0.5, offset, key, value, pal[index], units, ca_threshold, ar_threshold)
     index -= 1
   
   show(p)
@@ -156,6 +156,7 @@ def main(file, title, width, height, xrange, units):
   data = load(file)
   data = convert(data, units)
   data = augment(data)
+
   generate(data, title, width, height, xrange, units)
 
 
