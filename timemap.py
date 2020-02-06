@@ -1,7 +1,8 @@
 from bokeh.colors.named import darkgray, firebrick, gray, lavender, white, goldenrod
 from bokeh.io import show, output_file
 from bokeh.models.ranges import DataRange1d
-from bokeh.palettes import viridis
+from colorcet import rainbow as palette
+from bokeh.palettes import linear_palette
 from bokeh.plotting import figure
 from bokeh.models import Label
 
@@ -74,7 +75,7 @@ def generate(data, title, width, height, x_range, units):
   ar_threshold = sorted(d[3] for d in data.values() if d[3]>0)[-3:][0]
 
   rows = len(data)
-  pal = viridis(rows)
+  pal = linear_palette(palette, rows)
   
   p = figure(title=title, plot_height=height, plot_width=width, y_range=list(reversed(data)))
   p.x_range.range_padding = PADDING_PERCENT
