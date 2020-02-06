@@ -121,9 +121,13 @@ def augment(data):
         map((lambda x: x[2]/100), data.values()))),
   )
     
-  # add activity ratio and return
-  return OrderedDict((key, (*value, value[0]-value[1])) for key, value in data.items())
+  # add something like activity ratio, (lt-pt rather than lt/pt) to
+  # determine where our biggest delays are.  This is more interesting
+  # than actual ar, since we don't really care about a low activity
+  # ratio if lt is negligible...
+  data =  OrderedDict((key, (*value, value[0]-value[1])) for key, value in data.items())
 
+  return data
 
 def load(file):
   """
