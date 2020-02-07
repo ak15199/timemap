@@ -185,14 +185,24 @@ def load(file):
 
 
 @click.command()
-@click.option("-h", "--height", default=350, type=int, help="Figure height")
-@click.option("-i", "--items", default=3, type=int, help="Number of worst items to highlight")
-@click.option("-t", "--title", default="", help="Figure title")
-@click.option("-u", "--units", default="h", type=click.Choice(["h", "d", "w"], case_sensitive=False), help="Display units (h, d, w)")
-@click.option("-w", "--width", default=800, type=int, help="Figure width")
-@click.option("-x", "--xrange", default=None, type=int, help="Figure Max X value")
+@click.option("-h", "--height", default=350, type=int,
+            help="Figure height")
+@click.option("-i", "--items", default=3, type=int,
+            help="Number of worst items to highlight")
+@click.option("-t", "--title", default="",
+            help="Figure title")
+@click.option("-u", "--units", default=list(UNITS.keys())[0],
+            type=click.Choice(UNITS.keys(), case_sensitive=False),
+            help="Display units (%s)"%", ".join((f"{k} ({v['text']})" for k, v in UNITS.items())))
+@click.option("-w", "--width", default=800, type=int,
+            help="Figure width")
+@click.option("-x", "--xrange", default=None, type=int,
+            help="Figure Max X value")
 @click.argument("file")
 def main(file, title, width, height, xrange, units, items):
+  """Generate a HTML chart presenting timeline from a
+     Value Stream Mapping exercise
+  """
 
   data = load(file)
   data = convert(data, units)
