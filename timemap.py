@@ -24,6 +24,7 @@ UNITS = {
   "d": {"text": "days", "factor": 8},
   "w": {"text": "weeks", "factor": 40},
 }
+OVERALL_LABEL = "Overall"
 
 
 def label(p, x, y, align, color, text):
@@ -124,6 +125,8 @@ def generate(data, title, width, height, x_range, units):
   offset = 0
 
   for key, value in data.items():
+    if key == OVERALL_LABEL:
+      offset = 0
     offset = offset + bar(p, index+0.5, offset, key, value, pal[index], units, ca_threshold, ar_threshold)
     index -= 1
   
@@ -142,7 +145,7 @@ def augment(data):
   """
   Add summary/roll-up data to the chart, and calculate activity ratio
   """
-  data["Overall"] = (
+  data[OVERALL_LABEL] = (
     sum(item[0] for item in data.values()),
     sum(item[1] for item in data.values()),
     reduce(
