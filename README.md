@@ -6,7 +6,7 @@ The map itself is stored in a four column CSV file, with fields for:
 * stage (or task) name,
 * lead-time (how long the stage takes),
 * process time (how much time is actuially spent working on getting the stage completed, and
-* percent complete and accurate (How often the stage ic completed correctly and doesn't need to be sent back)
+* percent complete and accurate (How often the stage is completed correctly and doesn't need to be sent back)
 
 An annotated version of the output looks like this:
 
