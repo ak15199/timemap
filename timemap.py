@@ -47,17 +47,17 @@ def label(p, x, y, align, color, text):
   return l
 
 
-def bar(p, y, offset, key, value, color, units, ca_threshold, ar_threshold):
+def bar(p, y, offset, key, value, color, units, ca_threshold, ar_threshold, mask):
   HGHT_LT = 0.8
   HGHT_PT = 0.6
 
   lt, pt, ca, ar = value
 
-  color_ca = COLOR_CA.to_hex() if ca <= ca_threshold else darkgray.to_hex()
+  color_ca = COLOR_CA.to_hex() if not mask and ca <= ca_threshold else darkgray.to_hex()
   if ca>0:
     label(p, offset+lt, y, "left", color_ca, f"{ca:.0f}%")
     
-  color_ar = COLOR_AR.to_hex() if ar >= ar_threshold else darkgray.to_hex()
+  color_ar = COLOR_AR.to_hex() if not mask and ar >= ar_threshold else darkgray.to_hex()
   if ar>0:
     label(p, offset, y, "right", color_ar, f"{ar:.0f}{units}")
 
@@ -91,22 +91,12 @@ def legend(p):
   p.add_layout(l, "below")
 
 
-def generate(data, title, width, height, x_range, units, items):
-  """
-  Generate the chart
-  """
-  
+def plotarea(title, width, height, y_range, units):
   PADDING_PERCENT = 0.1  # left-right margin to accomodate labels
 
   output_file("output.html")
   
-  ca_threshold = sorted(d[2] for d in data.values() if d[2]>0)[:items][-1]
-  ar_threshold = sorted(d[3] for d in data.values() if d[3]>0)[-items:][0]
-
-  rows = len(data)
-  pal = linear_palette(palette, rows)
-  
-  p = figure(title=title, plot_height=height, plot_width=width, y_range=list(reversed(data)))
+  p = figure(title=title, plot_height=height, plot_width=width, y_range=y_range)
   p.x_range.range_padding = PADDING_PERCENT
   p.x_range.range_padding_units = "percent"
   p.y_range.range_padding = 0.1
@@ -117,18 +107,39 @@ def generate(data, title, width, height, x_range, units, items):
   p.xaxis.axis_label = UNITS[units]["text"]
   p.yaxis.axis_label = None
 
+  return p
+
+
+def generate(data, title, width, height, x_range, units, items):
+  """
+  Generate the chart
+  """
+  
+  p = plotarea(title, width, height, list(reversed(data)), units)
+
+  # Add one to items that we retrieve in determining thresholds, since the final
+  # slot is going to get swallowed by the summary line
+  ca_threshold = sorted(d[2] for d in data.values() if d[2]>0)[:(items+1)][-1]
+  ar_threshold = sorted(d[3] for d in data.values() if d[3]>0)[-(items+1):][0]
+
+  rows = len(data)
+  pal = linear_palette(palette, rows)
+  
   # If a maximum value is specified, then push out how far the x axis will go
   # this helps with apples-to-apples comparison between before and after charts
   if x_range is not None:
-    p.rect(x=x_range, y=0, width=1, height=1, fill_alpha=0.0, color=lavender)
+    p.rect(x=x_range, y=0, width=1, height=1, fill_alpha=0.0)
   
   index = rows-1
   offset = 0
 
   for key, value in data.items():
-    if key == OVERALL_LABEL:
+    mask = (key == OVERALL_LABEL)
+    if mask:
       offset = 0
-    offset = offset + bar(p, index+0.5, offset, key, value, pal[index], units, ca_threshold, ar_threshold)
+
+    offset = offset + bar(p, index+0.5, offset, key, value,
+                          pal[index], units, ca_threshold, ar_threshold, mask)
     index -= 1
   
   legend(p)
