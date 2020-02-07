@@ -109,13 +109,13 @@ def generate(data, title, width, height, x_range, units, items):
   p = figure(title=title, plot_height=height, plot_width=width, y_range=list(reversed(data)))
   p.x_range.range_padding = PADDING_PERCENT
   p.x_range.range_padding_units = "percent"
+  p.y_range.range_padding = 0.1
   p.background_fill_color = lavender
   p.border_fill_color= lighten(lavender.to_hex())
   p.grid.grid_line_alpha=1.0
   p.grid.grid_line_color = white
   p.xaxis.axis_label = UNITS[units]["text"]
   p.yaxis.axis_label = None
-  p.min_border = 5
 
   # If a maximum value is specified, then push out how far the x axis will go
   # this helps with apples-to-apples comparison between before and after charts
