@@ -91,7 +91,7 @@ def legend(p):
   p.add_layout(l, "below")
 
 
-def generate(data, title, width, height, x_range, units):
+def generate(data, title, width, height, x_range, units, items):
   """
   Generate the chart
   """
@@ -100,8 +100,8 @@ def generate(data, title, width, height, x_range, units):
 
   output_file("output.html")
   
-  ca_threshold = sorted(d[2] for d in data.values() if d[2]>0)[:3][-1]
-  ar_threshold = sorted(d[3] for d in data.values() if d[3]>0)[-3:][0]
+  ca_threshold = sorted(d[2] for d in data.values() if d[2]>0)[:items][-1]
+  ar_threshold = sorted(d[3] for d in data.values() if d[3]>0)[-items:][0]
 
   rows = len(data)
   pal = linear_palette(palette, rows)
@@ -115,6 +115,7 @@ def generate(data, title, width, height, x_range, units):
   p.grid.grid_line_color = white
   p.xaxis.axis_label = UNITS[units]["text"]
   p.yaxis.axis_label = None
+  p.min_border = 5
 
   # If a maximum value is specified, then push out how far the x axis will go
   # this helps with apples-to-apples comparison between before and after charts
@@ -184,19 +185,20 @@ def load(file):
 
 
 @click.command()
-@click.option("-t", "--title", default="", help="Figure title")
-@click.option("-w", "--width", default=800, type=int, help="Figure width")
 @click.option("-h", "--height", default=350, type=int, help="Figure height")
-@click.option("-x", "--xrange", default=None, type=int, help="Figure Max X value")
+@click.option("-i", "--items", default=3, type=int, help="Number of worst items to highlight")
+@click.option("-t", "--title", default="", help="Figure title")
 @click.option("-u", "--units", default="h", type=click.Choice(["h", "d", "w"], case_sensitive=False), help="Display units (h, d, w)")
+@click.option("-w", "--width", default=800, type=int, help="Figure width")
+@click.option("-x", "--xrange", default=None, type=int, help="Figure Max X value")
 @click.argument("file")
-def main(file, title, width, height, xrange, units):
+def main(file, title, width, height, xrange, units, items):
 
   data = load(file)
   data = convert(data, units)
   data = augment(data)
 
-  generate(data, title, width, height, xrange, units)
+  generate(data, title, width, height, xrange, units, items)
 
 
 if __name__ == "__main__":
