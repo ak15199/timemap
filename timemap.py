@@ -193,13 +193,13 @@ def load(file):
     with open(file, newline='') as csvfile:
         reader = csv.reader(csvfile, delimiter=',', quotechar='|')
         for row in reader:
-            if row[0][0] == "#" or len(row) != 4:
-                pass
+            if row[0][0] == "#":
+                continue
 
             try:
                 data[row[0]] = (int(row[1]), int(row[2]), int(row[3]))
             except IndexError:
-                print("Not enough columns: " + ",".join(row))
+                print("Wrong number of columns: " + ",".join(row))
 
     return data
 
