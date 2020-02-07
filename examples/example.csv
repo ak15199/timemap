@@ -1,5 +1,6 @@
-Define,105,40
-Develop,99,34
-Test,109,80
-Approve,45,15
-Deploy,135,12
+# Stage, LT, PT, %C&A
+Define,105,40,50
+Develop,160,90,95
+Test,100,95,100
+Approve,45,15,90
+Deploy,135,12,70
