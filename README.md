@@ -1,5 +1,5 @@
 
-Timemap will gernerate a Gantt-like chart describing the output of a value stream mapping exercise.
+Timemap will generate a Gantt-like chart describing the output of a value stream mapping exercise.
 
 The map itself is stored in a four column CSV file, with fields for:
 
