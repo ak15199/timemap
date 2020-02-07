@@ -1,0 +1,16 @@
+# Stage, LT, PT, %C&A
+Requirements Finalized,75,50,75
+Architecture Review,160,40,100
+Estimating,40,8,80
+Estimation Review,0,0,0
+Build Roadmap,80,40,50
+Environment Setup,40,4,90
+Coding,80,40,0
+Deployment Instructions,8,3,90
+Deploy to Pre-Prod,8,1,0
+Write Tests,0,0,0
+Functional Testing,80,40,0
+UAT,160,80,0
+CR Go/No Go,40,8,90
+Deploy to Prod,0,0,0
+Smoke Testing,0,0,0
