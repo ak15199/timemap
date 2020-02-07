@@ -1,11 +1,15 @@
-from bokeh.colors.named import darkgray, firebrick, gray, lavender, white, goldenrod
+from bokeh.colors.named import darkgray, gray, lavender, white
+from bokeh.colors.named import firebrick as COLOR_CA
+from bokeh.colors.named import goldenrod as COLOR_AR
+
+from bokeh.core.enums import LegendLocation
 from bokeh.io import show, output_file
-from bokeh.models.ranges import DataRange1d
-from colorcet import rainbow as palette
+from bokeh.models import Label, Legend
+from bokeh.models.glyphs import Rect
 from bokeh.palettes import linear_palette
 from bokeh.plotting import figure
-from bokeh.models import Label
 
+from colorcet import rainbow as palette
 from collections import OrderedDict
 import click
 import csv
@@ -39,6 +43,8 @@ def label(p, x, y, align, color, text):
   
   p.add_layout(l)
 
+  return l
+
 
 def bar(p, y, offset, key, value, color, units, ca_threshold, ar_threshold):
   HGHT_LT = 0.8
@@ -46,11 +52,11 @@ def bar(p, y, offset, key, value, color, units, ca_threshold, ar_threshold):
 
   lt, pt, ca, ar = value
 
-  color_ca = firebrick.to_hex() if ca <= ca_threshold else darkgray.to_hex()
+  color_ca = COLOR_CA.to_hex() if ca <= ca_threshold else darkgray.to_hex()
   if ca>0:
     label(p, offset+lt, y, "left", color_ca, f"{ca:.0f}%")
     
-  color_ar = goldenrod.to_hex() if ar >= ar_threshold else darkgray.to_hex()
+  color_ar = COLOR_AR.to_hex() if ar >= ar_threshold else darkgray.to_hex()
   if ar>0:
     label(p, offset, y, "right", color_ar, f"{ar:.0f}{units}")
 
@@ -61,6 +67,28 @@ def bar(p, y, offset, key, value, color, units, ca_threshold, ar_threshold):
 
   return lt
   
+
+def legend(p):
+  
+  def glyph(color):
+    return p.add_glyph(Rect(
+        x=0, y=0,
+        fill_color=color.to_hex(),
+        line_color=darken(color.to_hex())),
+      visible=False)
+    
+  l = Legend(
+    items=[
+      ("Long Lead-time", [glyph(COLOR_AR)]),
+      ("High Error Rate", [glyph(COLOR_CA)]),
+      ],
+    location="bottom_right", orientation="horizontal",
+    border_line_color=gray,
+    title='Priority Items to Address'
+  )
+
+  p.add_layout(l, "below")
+
 
 def generate(data, title, width, height, x_range, units):
   """
@@ -81,6 +109,7 @@ def generate(data, title, width, height, x_range, units):
   p.x_range.range_padding = PADDING_PERCENT
   p.x_range.range_padding_units = "percent"
   p.background_fill_color = lavender
+  p.border_fill_color= lighten(lavender.to_hex())
   p.grid.grid_line_alpha=1.0
   p.grid.grid_line_color = white
   p.xaxis.axis_label = UNITS[units]["text"]
@@ -98,6 +127,8 @@ def generate(data, title, width, height, x_range, units):
     offset = offset + bar(p, index+0.5, offset, key, value, pal[index], units, ca_threshold, ar_threshold)
     index -= 1
   
+  legend(p)
+
   show(p)
 
 
