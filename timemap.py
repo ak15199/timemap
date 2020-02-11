@@ -188,16 +188,20 @@ def load(file):
     """
 
     data = OrderedDict()
+    line = 0
     with open(file, newline='') as csvfile:
         reader = csv.reader(csvfile, delimiter=',', quotechar='|')
         for row in reader:
+            line += 1
             if row[0][0] == "#":
                 continue
 
             try:
                 data[row[0]] = (int(row[1]), int(row[2]), int(row[3]))
             except IndexError:
-                print("Wrong number of columns: " + ",".join(row))
+                click.echo(f"(line {line}) Wrong number of columns: " + ",".join(row), err=True)
+            except Exception as e:
+                click.echo(f"(line {line}) Error: " + ",".join(row), err=True)
 
     return data
 
