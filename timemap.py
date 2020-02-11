@@ -93,8 +93,6 @@ def legend(p):
 def plotarea(title, width, height, y_range, units):
     PADDING_PERCENT = 0.1  # left-right margin to accomodate labels
 
-    output_file("output.html")
-
     p = figure(
         title=title,
         plot_height=height,
@@ -209,6 +207,8 @@ def load(file):
               help="Figure height")
 @click.option("-i", "--items", default=3, type=int,
               help="Number of worst items to highlight")
+@click.option("-o", "--output", default="output.html", type=str,
+              help="HTML output file name")
 @click.option("-t", "--title", default="",
               help="Figure title")
 @click.option("-u", "--units", default=list(UNITS.keys())[0],
@@ -221,10 +221,12 @@ def load(file):
 @click.option("-x", "--xrange", default=None, type=int,
               help="Figure Max X value")
 @click.argument("file")
-def main(file, title, width, height, xrange, units, items):
+def main(file, title, width, height, xrange, units, items, output):
     """Generate a HTML chart presenting timeline from a
        Value Stream Mapping exercise
     """
+
+    output_file(output)
 
     data = load(file)
     data = convert(data, units)
