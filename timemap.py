@@ -14,6 +14,7 @@ from colorcet import rainbow as palette
 import csv
 
 from functools import reduce
+import operator
 
 import re
 
@@ -164,14 +165,15 @@ def augment(data):
     """
     Add summary/roll-up data to the chart, and calculate complete&accurate
     """
+    def percent(value):
+        if value[2]:
+            return value[2]/100
+        return 1
+
     data[OVERALL_LABEL] = (
         sum(item[0] for item in data.values()),
         sum(item[1] for item in data.values()),
-        reduce(
-            (lambda x, y: x / y),
-            map(
-                (lambda x: x if x else 1),
-                map((lambda x: x[2] / 100), data.values()))),
+        100*reduce(operator.mul, map(percent, data.values())),
     )
 
     # add something like activity ratio, (lt-pt rather than lt/pt) to
