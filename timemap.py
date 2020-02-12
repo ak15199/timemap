@@ -134,7 +134,7 @@ def generate(data, title, width, height, x_range, units, items):
     # this helps with apples-to-apples comparison between before and after
     # charts
     if x_range is not None:
-        p.rect(x=x_range, y=0, width=1, height=1, fill_alpha=0.0)
+        p.rect(x=x_range, y=0, width=1, height=1, line_alpha=0, fill_alpha=0.0)
 
     index = rows - 1
     offset = 0
