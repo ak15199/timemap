@@ -15,6 +15,8 @@ import csv
 
 from functools import reduce
 
+import re
+
 from dim import bolden, darken, lighten
 
 
@@ -160,7 +162,7 @@ def convert(data, units):
 
 def augment(data):
     """
-    Add summary/roll-up data to the chart, and calculate activity ratio
+    Add summary/roll-up data to the chart, and calculate complete&accurate
     """
     data[OVERALL_LABEL] = (
         sum(item[0] for item in data.values()),
@@ -201,7 +203,7 @@ def load(file):
             except IndexError:
                 click.echo(f"(line {line}) Wrong number of columns: " + ",".join(row), err=True)
             except Exception as e:
-                click.echo(f"(line {line}) Error: " + ",".join(row), err=True)
+                click.echo(f"(line {line}) error: " + ",".join(row), err=True)
 
     return data
 
@@ -211,7 +213,7 @@ def load(file):
               help="Figure height")
 @click.option("-i", "--items", default=3, type=int,
               help="Number of worst items to highlight")
-@click.option("-o", "--output", default="output.html", type=str,
+@click.option("-o", "--output", default=None, type=str,
               help="HTML output file name")
 @click.option("-t", "--title", default="",
               help="Figure title")
@@ -224,15 +226,17 @@ def load(file):
               help="Figure width")
 @click.option("-x", "--xrange", default=None, type=int,
               help="Figure Max X value")
-@click.argument("file")
-def main(file, title, width, height, xrange, units, items, output):
+@click.argument("input")
+def main(input, title, width, height, xrange, units, items, output):
     """Generate a HTML chart presenting timeline from a
        Value Stream Mapping exercise
     """
 
+    if not output:
+        output = re.sub(r'.csv$', '.html', input)
     output_file(output)
 
-    data = load(file)
+    data = load(input)
     data = convert(data, units)
     data = augment(data)
 
