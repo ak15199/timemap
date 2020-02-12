@@ -20,13 +20,13 @@ import re
 
 from dim import bolden, darken, lighten
 
-LABEL_SIZE = "9pt"
 
 UNITS = {
     "h": {"text": "hours", "factor": 1},
     "d": {"text": "days", "factor": 8},
     "w": {"text": "weeks", "factor": 40},
 }
+
 OVERALL_LABEL = "Overall"
 
 
@@ -39,7 +39,8 @@ def label(p, x, y, align, color, text):
         x=x, y=y,
         x_offset=x_offset,
         text=f" {text} ",
-        text_font_size=LABEL_SIZE, text_color=white,
+        text_font_size=p.yaxis.major_label_text_font_size,
+        text_color=white,
         text_baseline='middle', text_align=align,
         background_fill_color=color, border_line_color=darken(color),
     )
@@ -73,6 +74,8 @@ def bar(p, y, offset, value, color, units, ca_threshold, ar_threshold, mask):
 
 def legend(p):
 
+    font_size = p.yaxis.axis_label_text_font_size
+
     def glyph(color):
         return p.add_glyph(Rect(
             x=0, y=0,
@@ -88,26 +91,27 @@ def legend(p):
         location="bottom_right", orientation="horizontal",
         border_line_color=gray,
         title="Priority Items to Address",
-        title_text_font_size=LABEL_SIZE,
-        label_text_font_size=LABEL_SIZE
+        title_text_font_size=p.yaxis.major_label_text_font_size,
+        label_text_font_size=p.yaxis.major_label_text_font_size
     )
 
     p.add_layout(l, "below")
 
 
 def plotarea(title, width, height, y_range, units):
-    PADDING_PERCENT = 0.1  # left-right margin to accomodate labels
+    PADDING_PERCENT = 0.2  # magic number left-right margin to accomodate labels
 
     p = figure(
         title=title,
         plot_height=height,
         plot_width=width,
+        background_fill_color=lavender,
+        border_fill_color=lighten(lavender.to_hex()),
         y_range=y_range)
+
     p.x_range.range_padding = PADDING_PERCENT
     p.x_range.range_padding_units = "percent"
     p.y_range.range_padding = 0.1
-    p.background_fill_color = lavender
-    p.border_fill_color = lighten(lavender.to_hex())
     p.grid.grid_line_alpha = 1.0
     p.grid.grid_line_color = white
     p.xaxis.axis_label = UNITS[units]["text"]
@@ -116,12 +120,13 @@ def plotarea(title, width, height, y_range, units):
     return p
 
 
-def generate(data, title, width, height, x_range, units, items):
+def generate(data, title, width, height, x_range, units, font_size, items):
     """
     Generate the chart
     """
 
     p = plotarea(title, width, height, list(reversed(data)), units)
+    p.yaxis.major_label_text_font_size = font_size
 
     # Add one to items that we retrieve in determining thresholds, since the final
     # slot is going to get swallowed by the summary line
@@ -213,6 +218,8 @@ def load(file):
 
 
 @click.command()
+@click.option("-f", "--font-size", default="10pt", type=str,
+              help="Font size ('10pt')")
 @click.option("-h", "--height", default=350, type=int,
               help="Figure height")
 @click.option("-i", "--items", default=3, type=int,
@@ -231,7 +238,7 @@ def load(file):
 @click.option("-x", "--xrange", default=None, type=int,
               help="Figure Max X value")
 @click.argument("input")
-def main(input, title, width, height, xrange, units, items, output):
+def main(input, font_size, title, width, height, xrange, units, items, output):
     """Generate a HTML chart presenting timeline from a
        Value Stream Mapping exercise
     """
@@ -244,7 +251,7 @@ def main(input, title, width, height, xrange, units, items, output):
     data = convert(data, units)
     data = augment(data)
 
-    generate(data, title, width, height, xrange, units, items)
+    generate(data, title, width, height, xrange, units, font_size, items)
 
 
 if __name__ == "__main__":
