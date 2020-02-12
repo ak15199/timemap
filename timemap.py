@@ -20,6 +20,7 @@ import re
 
 from dim import bolden, darken, lighten
 
+LABEL_SIZE = "9pt"
 
 UNITS = {
     "h": {"text": "hours", "factor": 1},
@@ -30,7 +31,6 @@ OVERALL_LABEL = "Overall"
 
 
 def label(p, x, y, align, color, text):
-    LABEL_SIZE = "9pt"
     LABEL_OFFSET = 2
 
     x_offset = LABEL_OFFSET if align == "left" else -LABEL_OFFSET
@@ -87,7 +87,9 @@ def legend(p):
         ],
         location="bottom_right", orientation="horizontal",
         border_line_color=gray,
-        title='Priority Items to Address'
+        title="Priority Items to Address",
+        title_text_font_size=LABEL_SIZE,
+        label_text_font_size=LABEL_SIZE
     )
 
     p.add_layout(l, "below")
