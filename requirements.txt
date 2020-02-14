@@ -1,3 +1,4 @@
 bokeh==1.4.0
 colorcet==2.0.2
 Click==7.0
+parse==1.14.0

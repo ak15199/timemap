@@ -15,6 +15,7 @@ import csv
 
 from functools import reduce
 import operator
+from parse import parse
 
 import re
 
@@ -120,6 +121,20 @@ def plotarea(title, width, height, y_range, units):
     return p
 
 
+def ptmult(size, mult):
+    a = parse("{value:d}{units:w}", size)
+    if a:
+        units = a["units"]
+    else:
+        a = parse("{value:d}", size)
+        units = "pt"
+        if not a:
+            click.echo(f"Unparsable font size: '{size}'", err=True)
+            exit(1)
+
+    return f"{a['value']*mult}{units}"
+
+
 def generate(data, title, width, height, x_range, units, font_size, items):
     """
     Generate the chart
@@ -127,6 +142,7 @@ def generate(data, title, width, height, x_range, units, font_size, items):
 
     p = plotarea(title, width, height, list(reversed(data)), units)
     p.yaxis.major_label_text_font_size = font_size
+    p.title.text_font_size = ptmult(font_size, 1.2)
 
     # Add one to items that we retrieve in determining thresholds, since the final
     # slot is going to get swallowed by the summary line
